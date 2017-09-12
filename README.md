@@ -1,4 +1,4 @@
-[![](https://images.microbadger.com/badges/image/kevineye/shairport-sync.svg)](https://microbadger.com/images/kevineye/shairport-sync "Get your own image badge on microbadger.com")
+Raspberry Pi version of kevineye/docker-shairport-sync.
 
 [shairport-sync](https://github.com/mikebrady/shairport-sync) is an Apple AirPlay receiver. It can receive audio directly from iOS devices, iTunes, etc. Multiple instances of shairport-sync will stay in sync with each other and other AirPlay devices when used with a compatible multi-room player, such as iTunes or [forked-daapd](https://github.com/jasonmc/forked-daapd).
 
@@ -8,7 +8,7 @@
         --net host \
         --device /dev/snd \
         -e AIRPLAY_NAME=Docker \
-        kevineye/shairport-sync
+        orbsmiv/shairport-sync-rpi
 
 ### Parameters
 
@@ -25,6 +25,6 @@ Send output to a named pipe:
     docker run -d \
         --net host \
         -v /some/pipe:/output \
-        kevineye/shairport-sync \
+        orbsmiv/shairport-sync-rpi \
             -o pipe \
             -- /output
