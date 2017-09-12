@@ -17,12 +17,12 @@ RUN apk -U add \
         curl
 
 RUN mkdir /root/shairport-sync
+
 WORKDIR /root/shairport-sync
 
 RUN curl -L -o ./shairport-sync.tar.gz https://github.com/mikebrady/shairport-sync/archive/3.1.2.tar.gz
 RUN tar -zxvf shairport-sync.tar.gz --strip-components=1
 RUN rm shairport-sync.tar.gz
-
 
 RUN autoreconf -i -f \
  && ./configure \
@@ -34,6 +34,9 @@ RUN autoreconf -i -f \
         --with-metadata \
  && make \
  && make install
+
+RUN cp ./scripts/shairport-sync.conf /etc/shairport-sync.conf
+
 
 WORKDIR /
 
