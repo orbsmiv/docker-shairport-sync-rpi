@@ -4,11 +4,14 @@ Raspberry Pi version of kevineye/docker-shairport-sync.
 
 ## Run
 
-    docker run -d \
-        --net host \
-        --device /dev/snd \
-        -e AIRPLAY_NAME=Docker \
-        orbsmiv/shairport-sync-rpi
+```
+docker run -d \
+    --net host \
+    --device /dev/snd \
+    -e AIRPLAY_NAME=Docker \
+    -v /path/to/custom/shairport-sync.conf:/etc/shairport-sync.conf
+    orbsmiv/shairport-sync-rpi
+```
 
 ### Parameters
 
