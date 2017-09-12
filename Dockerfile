@@ -1,5 +1,5 @@
-FROM alpine:edge
-MAINTAINER kevineye@gmail.com
+FROM hypriot/rpi-alpine:latest
+MAINTAINER orbsmiv@hotmail.com
 
 RUN apk -U add \
         git \
