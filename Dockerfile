@@ -14,12 +14,17 @@ RUN apk -U add \
         soxr-dev \
         avahi-dev \
         libconfig-dev \
+        curl
 
- && cd /root \
- && git clone https://github.com/mikebrady/shairport-sync.git \
- && cd shairport-sync \
+RUN mkdir /root/shairport-sync
+WORKDIR /root/shairport-sync
 
- && autoreconf -i -f \
+RUN curl -L -o ./shairport-sync.tar.gz https://github.com/mikebrady/shairport-sync/archive/3.1.2.tar.gz
+RUN tar -zxvf shairport-sync.tar.gz --strip-components=1
+RUN rm shairport-sync.tar.gz
+
+
+RUN autoreconf -i -f \
  && ./configure \
         --with-alsa \
         --with-pipe \
@@ -28,10 +33,11 @@ RUN apk -U add \
         --with-soxr \
         --with-metadata \
  && make \
- && make install \
+ && make install
 
- && cd / \
- && apk --purge del \
+WORKDIR /
+
+RUN apk --purge del \
         git \
         build-base \
         autoconf \
