@@ -3,7 +3,11 @@ MAINTAINER orbsmiv@hotmail.com
 
 RUN [ "cross-build-start" ]
 
-RUN apk -U add \
+ENV SHAIRPORT_VER=3.1.2
+
+WORKDIR /
+
+RUN apk --no-cache -U add \
         git \
         build-base \
         autoconf \
@@ -16,33 +20,24 @@ RUN apk -U add \
         soxr-dev \
         avahi-dev \
         libconfig-dev \
-        curl
-
-RUN mkdir /root/shairport-sync
-
-WORKDIR /root/shairport-sync
-
-RUN curl -L -o ./shairport-sync.tar.gz https://github.com/mikebrady/shairport-sync/archive/3.1.2.tar.gz
-RUN tar -zxvf shairport-sync.tar.gz --strip-components=1
-RUN rm shairport-sync.tar.gz
-
-RUN autoreconf -i -f \
- && ./configure \
+        curl \
+  && mkdir /root/shairport-sync \
+  && cd /root/shairport-sync \
+  && curl -L -o ./shairport-sync.tar.gz https://github.com/mikebrady/shairport-sync/archive/$SHAIRPORT_VER.tar.gz \
+  && tar -zxvf shairport-sync.tar.gz --strip-components=1 \
+  && autoreconf -i -f \
+  && ./configure \
         --with-alsa \
         --with-pipe \
         --with-avahi \
         --with-ssl=openssl \
         --with-soxr \
         --with-metadata \
- && make \
- && make install
-
-RUN cp ./scripts/shairport-sync.conf /etc/shairport-sync.conf
-
-
-WORKDIR /
-
-RUN apk --purge del \
+  && make \
+  && make install \
+  && cp ./scripts/shairport-sync.conf /etc/shairport-sync.conf \
+  && cd / \
+  && apk --purge del \
         git \
         build-base \
         autoconf \
@@ -55,7 +50,7 @@ RUN apk --purge del \
         soxr-dev \
         avahi-dev \
         libconfig-dev \
- && apk add \
+  && apk add --no-cache \
         dbus \
         alsa-lib \
         libdaemon \
@@ -64,9 +59,8 @@ RUN apk --purge del \
         soxr \
         avahi \
         libconfig \
- && rm -rf \
+  && rm -rf \
         /etc/ssl \
-        /var/cache/apk/* \
         /lib/apk/db/* \
         /root/shairport-sync
 
