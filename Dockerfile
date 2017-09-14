@@ -1,6 +1,8 @@
 FROM resin/armhf-alpine:latest
 MAINTAINER orbsmiv@hotmail.com
 
+RUN [ "cross-build-start" ]
+
 RUN apk -U add \
         git \
         build-base \
@@ -73,3 +75,5 @@ COPY start.sh /start
 ENV AIRPLAY_NAME Docker
 
 ENTRYPOINT [ "/start" ]
+
+RUN [ "cross-build-end" ]
