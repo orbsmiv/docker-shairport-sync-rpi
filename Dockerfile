@@ -1,4 +1,4 @@
-FROM hypriot/rpi-alpine:latest
+FROM resin/armhf-alpine:latest
 MAINTAINER orbsmiv@hotmail.com
 
 RUN apk -U add \
