@@ -3,7 +3,7 @@ MAINTAINER orbsmiv@hotmail.com
 
 RUN [ "cross-build-start" ]
 
-ENV SHAIRPORT_VER=3.1.5
+ENV SHAIRPORT_VER=3.1.7
 
 WORKDIR /
 
