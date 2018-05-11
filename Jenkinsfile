@@ -1,26 +1,26 @@
-// pipeline {
-//     steps {
-//         git url: 'https://github.com/orbsmiv/docker-shairport-sync-rpi.git'
-//     }
-// }
+node {
 
+    def scmVars
 
-pipeline {
+    stage('scm-clone') {
+        scmVars = checkout([$class: 'GitSCM', branches: [[name: '*/tags/*']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[refspec: '+refs/tags/*:refs/remotes/origin/tags/*', url: 'https://github.com/mikebrady/shairport-sync.git']]])
+        echo 'yay'
+        echo scmVars.GIT_BRANCH
+    }
 
-    agent any
-
-    stages {
-        stage('info') {
-            steps {
-                // checkout scm
-                // echo 'Hello World'
-                // echo env.WORKSPACE
-                echo env.GIT_BRANCH
-                sh('pwd')
-                // git url: 'https://github.com/orbsmiv/docker-shairport-sync-rpi.git'
-                sh('ls -la')
-                // echo env.GIT_BRANCH
-            }
+    stage('dockerfile-clone') {
+        dir('docker') {
+            git "https://github.com/orbsmiv/docker-shairport-sync-rpi.git"
         }
     }
+
+    stage('build-docker-image') {
+        echo pwd()
+        echo "Building image"
+        // def newImage = docker.build("my-image:${something}", "./docker")
+        // newImage.push()
+
+    }
+
+
 }
