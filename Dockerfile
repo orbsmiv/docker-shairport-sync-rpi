@@ -3,7 +3,7 @@ MAINTAINER orbsmiv@hotmail.com
 
 RUN [ "cross-build-start" ]
 
-ENV SHAIRPORT_VER=3.1.7
+ARG SHAIRPORT_VER=3.1.7
 
 WORKDIR /
 
@@ -23,7 +23,7 @@ RUN apk --no-cache -U add \
         curl \
   && mkdir /root/shairport-sync \
   && cd /root/shairport-sync \
-  && curl -L -o ./shairport-sync.tar.gz https://github.com/mikebrady/shairport-sync/archive/$SHAIRPORT_VER.tar.gz \
+  && curl -L -o ./shairport-sync.tar.gz https://github.com/mikebrady/shairport-sync/archive/${SHAIRPORT_VER}.tar.gz \
   && tar -zxvf shairport-sync.tar.gz --strip-components=1 \
   && autoreconf -i -f \
   && ./configure \
