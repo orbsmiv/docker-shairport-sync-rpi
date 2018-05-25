@@ -17,7 +17,7 @@ RUN apk --no-cache -U add \
         libressl-dev \
         soxr-dev \
         avahi-dev \
-        libconfig-dev \
+        libconfig-dev
 
 RUN mkdir /root/shairport-sync \
         && git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} \
