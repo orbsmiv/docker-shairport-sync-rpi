@@ -3,7 +3,7 @@ MAINTAINER orbsmiv@hotmail.com
 
 RUN [ "cross-build-start" ]
 
-ARG SHAIRPORT_VER=3.1.7
+ARG SHAIRPORT_VER=development
 
 RUN apk --no-cache -U add \
         git \
@@ -38,8 +38,12 @@ RUN autoreconf -i -f \
         && make \
         && make install
 
+RUN [ "cross-build-end" ]
+
 
 FROM resin/armhf-alpine:latest
+
+RUN [ "cross-build-start" ]
 
 RUN apk add --no-cache \
         dbus \
