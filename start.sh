@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 rm -rf /var/run
 mkdir -p /var/run/dbus
 
@@ -8,4 +10,4 @@ dbus-daemon --system
 
 avahi-daemon --daemonize --no-chroot
 
-/usr/local/bin/shairport-sync -c /etc/shairport-sync.conf -m avahi -a "$AIRPLAY_NAME" "$@"
+exec /usr/local/bin/shairport-sync -c /etc/shairport-sync.conf -m avahi -a "$AIRPLAY_NAME" "$@"
