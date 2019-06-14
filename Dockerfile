@@ -1,7 +1,5 @@
-FROM resin/armhf-alpine:latest AS builder
-MAINTAINER orbsmiv@hotmail.com
-
-RUN [ "cross-build-start" ]
+FROM alpine:3.9 AS builder
+MAINTAINER dubo-dubon-duponey
 
 ARG SHAIRPORT_VER=development
 
@@ -21,7 +19,7 @@ RUN apk --no-cache -U add \
 
 RUN mkdir /root/shairport-sync \
         && git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} \
-        git://github.com/mikebrady/shairport-sync \
+        git://github.com/dubo-dubon-duponey/shairport-sync \
         /root/shairport-sync
 
 WORKDIR /root/shairport-sync
@@ -34,16 +32,12 @@ RUN autoreconf -i -f \
               --with-ssl=openssl \
               --with-soxr \
               --with-metadata \
+              --with-apple-alac \
               --sysconfdir=/etc \
         && make \
         && make install
 
-RUN [ "cross-build-end" ]
-
-
-FROM resin/armhf-alpine:latest
-
-RUN [ "cross-build-start" ]
+FROM alpine:3.9 AS runner
 
 RUN apk add --no-cache \
         dbus \
@@ -64,8 +58,6 @@ COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
 
 COPY start.sh /start
 
-ENV AIRPLAY_NAME Docker
+ENV AIRPLAY_NAME TotaleCroquette
 
 ENTRYPOINT [ "/start" ]
-
-RUN [ "cross-build-end" ]

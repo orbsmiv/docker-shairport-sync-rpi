@@ -1,6 +1,14 @@
-Raspberry Pi version of kevineye/docker-shairport-sync.
+# What
 
-[shairport-sync](https://github.com/mikebrady/shairport-sync) is an Apple AirPlay receiver. It can receive audio directly from iOS devices, iTunes, etc. Multiple instances of shairport-sync will stay in sync with each other and other AirPlay devices when used with a compatible multi-room player, such as iTunes or [forked-daapd](https://github.com/jasonmc/forked-daapd).
+Based on [shairport-sync](https://github.com/mikebrady/shairport-sync), an Apple AirPlay receiver.
+
+It can receive audio directly from iOS devices, iTunes, etc. Multiple instances of shairport-sync will stay in sync with each other and other AirPlay devices when used with a compatible multi-room player, such as iTunes, Roon, or [forked-daapd](https://github.com/jasonmc/forked-daapd).
+
+This here is yet another fork of kevineye original docker image.
+
+The main difference here is that it is base on vanilla alpine (3.9), and generates a multi-architecture image (amd64, arm64, amrv7, armv6).
+
+Currently running this on a raspberry pi (armhf).
 
 ## Run
 
@@ -8,26 +16,14 @@ Raspberry Pi version of kevineye/docker-shairport-sync.
 docker run -d \
     --net host \
     --device /dev/snd \
-    -e AIRPLAY_NAME=Docker \
+    -e AIRPLAY_NAME=TotaleCroquette \
     -v /path/to/custom/shairport-sync.conf:/etc/shairport-sync.conf
-    orbsmiv/shairport-sync-rpi
+    dubodubonduponey/audio-airport:v1
 ```
 
 ### Parameters
 
-* `--net host` must be run in host mode
-* `--device /dev/snd` share host alsa system with container. Does not require `--privileged` as `-v /dev/snd:/dev/snd` would
-* `-e AIRPLAY_NAME=Docker` set the AirPlay device name. Defaults to Docker
-* extra arguments will be passed to shairplay-sync (try `-- help`)
-
-## More examples
-
-Send output to a named pipe:
-
-    mkfifo /some/pipe
-    docker run -d \
-        --net host \
-        -v /some/pipe:/output \
-        orbsmiv/shairport-sync-rpi \
-            -o pipe \
-            -- /output
+    * `--net host` is mandatory for this to work
+    * `--device /dev/snd` is mandatory as well
+    * `-e AIRPLAY_NAME=TotaleCroquette` set the AirPlay device name. Defaults to TotaleCroquette
+    * extra arguments will be passed to shairplay-sync (try `-- help`)
