@@ -2,9 +2,9 @@
 
 Docker image (amd64, arm64, armv7, armv6) for [shairport-sync](https://github.com/mikebrady/shairport-sync), an Apple AirPlay receiver.
 
-It can receive audio directly from iOS devices, iTunes, etc. Multiple instances of shairport-sync will stay in sync with each other and other AirPlay devices when used with a compatible multi-room player, such as iTunes, Roon, or [forked-daapd](https://github.com/jasonmc/forked-daapd).
+This is based on debian, unlike most of the other images around.
 
-This is yet another fork of kevineye original docker image.
+The reason is simple: avahi segfaults on Alpine - regularly.
 
 ## Run
 
@@ -13,22 +13,21 @@ docker run -d \
     --net host \
     --device /dev/snd \
     -e AIRPLAY_NAME=TotaleCroquette \
-    -v /path/to/custom/shairport-sync.conf:/etc/shairport-sync.conf
-    dubodubonduponey/audio-airport:v1
+    dubodubonduponey/audio-shairport-sync:v1
 ```
 
-### Parameters
-
- * `--net host` is mandatory for this to work
- * `--device /dev/snd` is mandatory as well
- * `-e AIRPLAY_NAME=TotaleCroquette` set the AirPlay device name. Defaults to TotaleCroquette
- * extra arguments will be passed to shairplay-sync (try `-- help`)
+You may optionally pass along `-v /path/to/custom/shairport-sync.conf:/etc/shairport-sync.conf`,
+or additional arguments, that will get stuffed into the shairport binary.
 
 ## Notes
 
-Differences compared to kevineye image:
+Both an Alpine and a Debian version are defined in the Dockerfile.
 
- * based on vanilla alpine (3.9) instead of resin / balena
+Debian is the default, for reasons outlined above.
+
+Differences compared to `kevineye` image:
+
+ * based on debian or vanilla alpine (3.9) instead of resin / balena
  * generates a multi-architecture image (amd64, arm64, amrv7, armv6)
  * shairport-sync source is forked under `dubo-dubon-duponey`
- * tested daily in production on a raspberry armv7 :p
+ * tested daily for many hours in production (sitting at my desk) on a raspberry armv7 (using the Debian variant)
