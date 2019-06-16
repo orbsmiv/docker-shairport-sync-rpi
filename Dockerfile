@@ -24,6 +24,7 @@ RUN mkdir /root/shairport-sync \
 
 WORKDIR /root/shairport-sync
 
+# --with-apple-alac unsupported for now
 RUN autoreconf -i -f \
         && ./configure \
               --with-alsa \
@@ -32,7 +33,6 @@ RUN autoreconf -i -f \
               --with-ssl=openssl \
               --with-soxr \
               --with-metadata \
-              --with-apple-alac \
               --sysconfdir=/etc \
         && make \
         && make install

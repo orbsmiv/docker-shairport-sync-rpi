@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IMAGE_OWNER=dubodubonduponey
-IMAGE_NAME=audio-airport
+IMAGE_NAME=audio-shairport-sync
 IMAGE_VERSION=v1
 
 export DOCKER_CLI_EXPERIMENTAL=enabled
