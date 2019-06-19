@@ -1,5 +1,5 @@
 FROM alpine:3.9 AS alpine-builder
-MAINTAINER dubo-dubon-duponey
+MAINTAINER dubodubonduponey@pm.me
 
 ARG SHAIRPORT_VER=development
 
@@ -66,7 +66,7 @@ ENTRYPOINT [ "/start" ]
 
 
 FROM debian:stretch-slim AS debian-builder
-MAINTAINER dubo-dubon-duponey
+MAINTAINER dubodubonduponey@pm.me
 
 ARG SHAIRPORT_VER=development
 
@@ -106,6 +106,7 @@ RUN autoreconf -i -f \
         && make install
 
 FROM debian:stretch-slim AS debian-runner
+MAINTAINER dubodubonduponey@pm.me
 
 RUN apt-get update -y && apt-get install -y \
         dbus \

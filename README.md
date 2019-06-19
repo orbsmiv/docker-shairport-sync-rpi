@@ -2,7 +2,7 @@
 
 Docker image (amd64, arm64, armv7, armv6) for [shairport-sync](https://github.com/mikebrady/shairport-sync), an Apple AirPlay receiver.
 
-This is based on debian, unlike most of the other images around.
+This is based on Debian, unlike most of the other images around.
 
 The reason is simple: avahi segfaults on Alpine - regularly.
 
