@@ -6,7 +6,7 @@ This is based on Debian, unlike most of the other images around. The reason is s
 
 ## Run
 
-```
+```bash
 docker run -d \
     --net host \
     --device /dev/snd \
@@ -26,15 +26,15 @@ of `shairport-sync`, you may want to consider `macvlan`.
 
 TL;DR:
 
-```
+```bash
 docker network create -d macvlan \
   --subnet=192.168.1.0/24 \
   --ip-range=192.168.1.128/25 \
   --gateway=192.168.1.1 \
   -o parent=eth0 hackvlan
   
-docker run -d -e AIRPLAY_NAME=N1 --device=/dev/snd --name=N1 --network=hackvlan dubodubonduponey/shairport-sync:v1
-docker run -d -e AIRPLAY_NAME=N2 --device=/dev/snd --name=N2 --network=hackvlan dubodubonduponey/shairport-sync:v1
+docker run -d -e NAME=N1 --device=/dev/snd --name=N1 --network=hackvlan dubodubonduponey/shairport-sync:v1
+docker run -d -e NAME=N2 --device=/dev/snd --name=N2 --network=hackvlan dubodubonduponey/shairport-sync:v1
 ```
 
 Need help with macvlan?
@@ -57,5 +57,5 @@ Main differences compared to `kevineye` image:
 
  * based on debian or vanilla alpine (3.9) instead of resin / balena
  * generates a multi-architecture image (amd64, arm64, amrv7, armv6)
- * shairport-sync source is forked under `dubo-dubon-duponey`
+ * shairport-sync source is forked on github under `dubo-dubon-duponey`
  * tested daily for many hours in production (sitting at my desk) on a raspberry armv7
