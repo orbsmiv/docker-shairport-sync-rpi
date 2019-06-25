@@ -63,5 +63,8 @@ COPY entrypoint.sh .
 COPY avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
 ENV NAME TotaleCroquette
+EXPOSE 554
+VOLUME "/etc/shairport-sync.conf"
+VOLUME "/etc/avahi/avahi-daemon.conf"
 
 ENTRYPOINT ["./entrypoint.sh"]

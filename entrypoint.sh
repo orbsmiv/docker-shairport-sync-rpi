@@ -2,6 +2,9 @@
 
 set -e
 
+# Useful on a container restart
+rm -f /var/run/dbus/pid
+
 dbus-uuidgen --ensure
 dbus-daemon --system
 avahi-daemon --daemonize --no-chroot
