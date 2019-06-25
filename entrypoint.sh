@@ -4,6 +4,7 @@ set -e
 
 # Useful on a container restart
 rm -f /var/run/dbus/pid
+rm -f /run/avahi-daemon/pid
 
 dbus-uuidgen --ensure
 dbus-daemon --system
