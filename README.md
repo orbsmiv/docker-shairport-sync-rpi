@@ -10,7 +10,7 @@ This is based on Debian, unlike most of the other images around. The reason is s
 docker run -d \
     --net host \
     --device /dev/snd \
-    -e NAME=TotaleCroquette \
+    --env NAME=TotaleCroquette \
     dubodubonduponey/shairport-sync:v1
 ```
 
@@ -33,8 +33,8 @@ docker network create -d macvlan \
   --gateway=192.168.1.1 \
   -o parent=eth0 hackvlan
   
-docker run -d -e NAME=N1 --device=/dev/snd --name=N1 --network=hackvlan dubodubonduponey/shairport-sync:v1
-docker run -d -e NAME=N2 --device=/dev/snd --name=N2 --network=hackvlan dubodubonduponey/shairport-sync:v1
+docker run -d --env NAME=N1 --device=/dev/snd --name=N1 --network=hackvlan dubodubonduponey/shairport-sync:v1
+docker run -d --env NAME=N2 --device=/dev/snd --name=N2 --network=hackvlan dubodubonduponey/shairport-sync:v1
 ```
 
 Need help with macvlan?
@@ -44,8 +44,8 @@ Need help with macvlan?
 
 Would you need to, you may optionally pass along:
  
- * `-v /path/to/custom/shairport-sync.conf:/etc/shairport-sync.conf` if you want to tweak shairport configuration
- * `-v /path/to/custom/avahi-daemon.conf:/etc/avahi/avahi-daemon.conf` if you need to tweak avahi
+ * `--volume [host_path]/shairport-sync.conf:/etc/shairport-sync.conf` if you want to tweak shairport configuration at runtime
+ * `--volume [host_path]/avahi-daemon.conf:/etc/avahi/avahi-daemon.conf` if you need to tweak avahi
 
 Also, any additional arguments when running the image will get fed to the shairport binary.
 
