@@ -1,72 +1,5 @@
-FROM alpine:3.9 AS alpine-builder
-MAINTAINER dubodubonduponey@pm.me
-
-ARG SHAIRPORT_VER=development
-
-RUN apk --no-cache -U add \
-        git \
-        build-base \
-        autoconf \
-        automake \
-        libtool \
-        alsa-lib-dev \
-        libdaemon-dev \
-        popt-dev \
-        libressl-dev \
-        soxr-dev \
-        avahi-dev \
-        libconfig-dev
-
-RUN mkdir /root/shairport-sync \
-        && git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} \
-        git://github.com/dubo-dubon-duponey/shairport-sync \
-        /root/shairport-sync
-
-WORKDIR /root/shairport-sync
-
-# --with-apple-alac unsupported for now
-RUN autoreconf -i -f \
-        && ./configure \
-              --with-alsa \
-              --with-pipe \
-              --with-avahi \
-              --with-ssl=openssl \
-              --with-soxr \
-              --with-metadata \
-              --sysconfdir=/etc \
-        && make \
-        && make install
-
-FROM alpine:3.9 AS alpine-runner
-
-RUN apk add --no-cache \
-        dbus \
-        alsa-lib \
-        libdaemon \
-        popt \
-        libressl \
-        soxr \
-        avahi \
-        libconfig \
-      && rm -rf \
-        /etc/ssl \
-        /lib/apk/db/* \
-        /root/shairport-sync
-
-COPY --from=alpine-builder /etc/shairport-sync* /etc/
-COPY --from=alpine-builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
-
-COPY start.sh /start
-
-ENV AIRPLAY_NAME TotaleCroquette
-
-ENTRYPOINT [ "/start" ]
-
-
-
-
-FROM debian:stretch-slim AS debian-builder
-MAINTAINER dubodubonduponey@pm.me
+FROM debian:stretch-slim AS builder
+MAINTAINER dubo-dubon-duponey@jsboot.space
 
 ARG SHAIRPORT_VER=development
 
@@ -85,15 +18,13 @@ RUN apt-get update -y && apt-get install -y \
         libssl-dev \
         libcrypto++-dev
 
-RUN mkdir /root/shairport-sync \
-        && git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} \
-        git://github.com/dubo-dubon-duponey/shairport-sync \
-        /root/shairport-sync
+WORKDIR /build
 
-WORKDIR /root/shairport-sync
+RUN git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} git://github.com/dubo-dubon-duponey/shairport-sync
 
 # --with-apple-alac unsupported for now
-RUN autoreconf -i -f \
+RUN cd shairport-sync \
+	&& autoreconf -i -f \
         && ./configure \
               --with-alsa \
               --with-pipe \
@@ -105,10 +36,11 @@ RUN autoreconf -i -f \
         && make \
         && make install
 
-FROM debian:stretch-slim AS debian-runner
-MAINTAINER dubodubonduponey@pm.me
+FROM debian:stretch-slim AS runner
+MAINTAINER dubo-dubon-duponey@jsboot.space
 
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
         dbus \
         libasound2 \
         libdaemon0 \
@@ -118,13 +50,18 @@ RUN apt-get update -y && apt-get install -y \
         libssl1.1 \
         avahi-daemon \
         libavahi-client3 \
-      && rm -rf /var/lib/apt/lists/*
+  && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
-COPY --from=debian-builder /etc/shairport-sync* /etc/
-COPY --from=debian-builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
+COPY --from=builder /etc/shairport-sync* /etc/
+COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
 
-COPY start.sh /start
+RUN mkdir -p /var/run/dbus
 
-ENV AIRPLAY_NAME TotaleCroquette
+WORKDIR /dubo-dubon-duponey
 
-ENTRYPOINT [ "/start" ]
+COPY entrypoint.sh .
+COPY avahi-daemon.conf /etc/avahi/avahi-daemon.conf
+
+ENV NAME TotaleCroquette
+
+ENTRYPOINT ["./entrypoint.sh"]
