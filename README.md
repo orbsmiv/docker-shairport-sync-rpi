@@ -34,7 +34,7 @@ docker network create -d macvlan \
   -o parent=eth0 hackvlan
   
 docker run -d -e AIRPLAY_NAME=N1 --device=/dev/snd --name=N1 --network=hackvlan dubodubonduponey/shairport-sync:v1
-docker run -d -e AIRPLAY_NAME=N1 --device=/dev/snd --name=N1 --network=hackvlan dubodubonduponey/shairport-sync:v1
+docker run -d -e AIRPLAY_NAME=N2 --device=/dev/snd --name=N2 --network=hackvlan dubodubonduponey/shairport-sync:v1
 ```
 
 Need help with macvlan?
