@@ -1,8 +1,9 @@
 # What
 
-Docker image (amd64, arm64, armv7, armv6) for [shairport-sync](https://github.com/mikebrady/shairport-sync), an Apple AirPlay receiver.
+A docker image for for [shairport-sync](https://github.com/mikebrady/shairport-sync), an Apple AirPlay receiver.
 
-This is based on Debian, unlike most of the other images around. The reason is simple: avahi segfaults on Alpine regularly.
+ * multi-architecture (linux/amd64, linux/arm64, linux/arm/v7, linux/arm/v6)
+ * based on debian:buster-slim
 
 ## Run
 
@@ -18,11 +19,10 @@ docker run -d \
 
 ### Network
 
- * `bridge` mode will NOT work, since mDNS will not broadcast on your lan subnet
- * `host` (default, easy choice) is only acceptable as long as you DO NOT have any other containers running on the same host using avahi
+ * `bridge` mode will NOT work for discovery, since mDNS will not broadcast on your lan subnet
+ * `host` (default, easy choice) is only acceptable as long as you DO NOT have any other containers running on the same ip using avahi
 
-If you intend on running multiple containers relying on avahi (like a timemachine server for eg), or even two instances
-of `shairport-sync`, you may want to consider `macvlan`.
+If you intend on running multiple containers relying on avahi, you may want to consider `macvlan`.
 
 TL;DR:
 
@@ -58,4 +58,4 @@ Main differences compared to `kevineye` image:
  * based on debian or vanilla alpine (3.9) instead of resin / balena
  * generates a multi-architecture image (amd64, arm64, amrv7, armv6)
  * shairport-sync source is forked on github under `dubo-dubon-duponey`
- * tested daily for many hours in production (sitting at my desk) on a raspberry armv7
+ * tested daily for many hours in production (sitting at my desk) on a raspberrypi armv7
