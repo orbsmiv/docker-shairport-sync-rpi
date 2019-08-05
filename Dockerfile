@@ -11,8 +11,8 @@ RUN         apt-get update                                                      
 RUN         apt-get install -y git build-essential autoconf automake libtool pkg-config                   > /dev/null
 WORKDIR     /build
 
-# shairport-sync: v3.3
-ARG         SHAIRPORT_VER=3c4a878ad9e0b3097c8c93433d6bf2f62af19c81
+# shairport-sync: v3.3.4
+ARG         SHAIRPORT_VER=b4c54fc576bb84cbb3f4ee177bf681f60fcdea9b
 # Blue-alsa: v1.4.0
 ARG         BLUEZ_VERSION=2725b4e8a0301aedb267d3db5850ab62586e6148
 # ALAC from apple: Feb 2019
