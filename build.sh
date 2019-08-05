@@ -2,7 +2,7 @@
 
 IMAGE_OWNER="${IMAGE_OWNER:-dubodubonduponey}"
 IMAGE_NAME="${IMAGE_NAME:-shairport-sync}"
-IMAGE_VERSION="${IMAGE_VERSION:-v3}"
+IMAGE_VERSION="${IMAGE_VERSION:-v1}"
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6}"
 
 export DOCKER_CONTENT_TRUST=1
