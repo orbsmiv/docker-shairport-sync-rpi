@@ -90,7 +90,6 @@ RUN         apt-get update              > /dev/null && \
                     libconfig9 \
                     libssl1.1 \
                     avahi-daemon \
-                    libnss-mdns \
                     libavahi-client3 \
                     bluetooth \
                     alsa-utils          > /dev/null && \
