@@ -3,12 +3,11 @@
 ##########################
 FROM        debian:buster-slim                                                                            AS builder
 
-MAINTAINER  dubo-dubon-duponey@jsboot.space
 # Install dependencies and tools
 ARG         DEBIAN_FRONTEND="noninteractive"
 ENV         TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 RUN         apt-get update                                                                                > /dev/null
-RUN         apt-get install -y git build-essential autoconf automake libtool pkg-config                   > /dev/null
+RUN         apt-get install -y --no-install-recommends git=1:2.20.1-2 build-essential=12.6 autoconf=2.69-11 automake=1:1.16.1-4 libtool=2.4.6-9 pkg-config=0.29-6 > /dev/null
 WORKDIR     /build
 
 # shairport-sync: v3.3.4
@@ -33,28 +32,30 @@ RUN         mkdir -p m4 && autoreconf -fi && ./configure && make && make install
 
 # blue-alsa
 WORKDIR     /build/bluez-alsa
-RUN         apt-get install -y check
-RUN         apt-get install -y  libasound2-dev \
-                        libbluetooth-dev \
-                        libdbus-1-dev \
-                        libglib2.0-dev \
-                        libsbc-dev \
-                        libreadline-dev \
-                        libbsd-dev \
-                        libncurses5-dev
+RUN         apt-get install -y --no-install-recommends check=0.10.0-3+b3
+RUN         apt-get install -y --no-install-recommends libasound2-dev=1.1.8-1 \
+                        libbluetooth-dev=5.50-1 \
+                        libdbus-1-dev=1.12.16-1 \
+                        libglib2.0-dev=2.58.3-2 \
+                        libsbc-dev=1.4-1 \
+                        libreadline-dev=7.0-5 \
+                        libbsd-dev=0.9.1-2 \
+                        libncurses5-dev=6.1+20181013-2
 RUN         mkdir -p m4 && autoreconf --install
-RUN         mkdir build && cd build && ../configure --enable-test --enable-msbc --enable-ofono --enable-alac && make && make test && make install
+
+WORKDIR     /build/shairport-sync/build
+RUN         ../configure --enable-test --enable-msbc --enable-ofono --enable-alac && make && make test && make install
 
 # shairport-sync
 WORKDIR     /build/shairport-sync
-RUN         apt-get install -y  libasound2-dev \
-                        libdaemon-dev \
-                        libpopt-dev \
-                        libsoxr-dev \
-                        libavahi-client-dev \
-                        libconfig-dev \
-                        libssl-dev \
-                        libcrypto++-dev
+RUN         apt-get install -y --no-install-recommends libasound2-dev=1.1.8-1 \
+                        libdaemon-dev=0.14-7 \
+                        libpopt-dev=1.16-12 \
+                        libsoxr-dev=0.1.2-3 \
+                        libavahi-client-dev=0.7-4+b1 \
+                        libconfig-dev=1.5-0.4 \
+                        libssl-dev=1.1.1c-1 \
+                        libcrypto++-dev=5.6.4-8
 RUN         autoreconf -fi \
               && ./configure \
                 --with-alsa \
@@ -73,26 +74,26 @@ RUN         autoreconf -fi \
 #######################
 FROM        debian:buster-slim
 
-MAINTAINER  dubo-dubon-duponey@jsboot.space
+LABEL       dockerfile.copyright="Dubo Dubon Duponey <dubo-dubon-duponey@jsboot.space>"
+
 ARG         DEBIAN_FRONTEND="noninteractive"
 ENV         TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 RUN         apt-get update              > /dev/null && \
-            apt-get dist-upgrade -y                 && \
             apt-get install -y --no-install-recommends \
-                    libbluetooth3 \
-                    libsbc1 \
-                    pkg-config \
-                    dbus \
-                    libasound2 \
-                    libdaemon0 \
-                    libpopt0 \
-                    libsoxr0 \
-                    libconfig9 \
-                    libssl1.1 \
-                    avahi-daemon \
-                    libavahi-client3 \
-                    bluetooth \
-                    alsa-utils          > /dev/null && \
+                    libbluetooth3=5.50-1 \
+                    libsbc1=1.4-1 \
+                    pkg-config=0.29-6 \
+                    dbus=1.12.16-1 \
+                    libasound2=1.1.8-1 \
+                    libdaemon0=0.14-7 \
+                    libpopt0=1.16-12 \
+                    libsoxr0=0.1.2-3 \
+                    libconfig9=1.5-0.4 \
+                    libssl1.1=1.1.1c-1 \
+                    avahi-daemon=0.7-4+b1 \
+                    libavahi-client3=0.7-4+b1 \
+                    bluetooth=5.50-1 \
+                    alsa-utils=1.1.8-2          > /dev/null && \
             apt-get -y autoremove       > /dev/null && \
             apt-get -y clean            && \
             rm -rf /var/lib/apt/lists/* && \
@@ -112,7 +113,7 @@ COPY        --from=builder /usr/local/lib/pkgconfig/alac.pc /usr/local/lib/pkgco
 COPY        --from=builder /usr/local/include/alac /usr/local/include/alac
 
 # Catch-up with libalac
-ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH":/usr/local/lib
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
 ENV NAME=TotaleCroquette
 EXPOSE 554
 #VOLUME "/etc/shairport-sync.conf"
