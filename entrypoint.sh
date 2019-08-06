@@ -84,6 +84,9 @@ ctl.$nick {
 EOF
 }
 
+# If there is no AVAHI_NAME, use the Airport service name
+AVAHI_NAME=${AVAHI_NAME:-$NAME}
+
 helpers::dbus
 helpers::avahi
 
