@@ -43,7 +43,7 @@ RUN         apt-get install -y --no-install-recommends libasound2-dev=1.1.8-1 \
                         libncurses5-dev=6.1+20181013-2
 RUN         mkdir -p m4 && autoreconf --install
 
-WORKDIR     /build/shairport-sync/build
+WORKDIR     /build/bluez-alsa/build
 RUN         ../configure --enable-test --enable-msbc --enable-ofono --enable-alac && make && make test && make install
 
 # shairport-sync
