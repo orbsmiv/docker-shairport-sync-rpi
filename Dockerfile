@@ -7,6 +7,8 @@ WORKDIR       /build
 
 # shairport-sync: v3.3.2
 ARG           SHAIRPORT_VER=ca9b2ff3bc1630c9de95f4555d4398d1a33ec2a3
+# with sigsegv fixes
+ARG           SHAIRPORT_VER=0e85ec370a08c3443b0b9e28707d1022efc0f74f
 # ALAC from apple: Feb 2019
 ARG           ALAC_VERSION=5d6d836ee5b025a5e538cfa62c88bc5bced506ed
 
@@ -49,7 +51,7 @@ RUN           autoreconf -fi \
 #######################
 # Extra builder for golang healthchecker
 #######################
-FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder         AS x-builder
+FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder         AS healthcheck-builder
 
 # XXX not cool - move that code into a proper separate repo (along with http-client)
 WORKDIR       $GOPATH/src/github.com/dubo-dubon-duponey/healthchecker
@@ -66,9 +68,6 @@ FROM          dubodubonduponey/base:runtime
 
 USER          root
 
-#                libavahi-client-dev=0.7-4+b1 \
-#                libdaemon-dev=0.14-7 \
-#               libdaemon0=0.14-7 \
 ARG           DEBIAN_FRONTEND="noninteractive"
 ENV           TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 RUN           apt-get update                > /dev/null \
@@ -87,8 +86,8 @@ RUN           apt-get update                > /dev/null \
 USER          dubo-dubon-duponey
 
 COPY          --from=builder /usr/local/bin/shairport-sync /boot/bin/shairport-sync
-COPY          --from=builder /usr/local/lib/libalac* /boot/lib/
-COPY          --from=x-builder /dist/bin/rtsp-client /boot/bin/
+COPY          --from=builder /usr/local/lib/libalac.so.0 /boot/lib/
+COPY          --from=healthcheck-builder /dist/bin/rtsp-client /boot/bin/
 
 # Catch-up with libalac
 ENV           LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/boot/lib"
