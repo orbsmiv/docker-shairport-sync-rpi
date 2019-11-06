@@ -89,7 +89,7 @@ USER          dubo-dubon-duponey
 
 COPY          --from=builder /usr/local/bin/shairport-sync /boot/bin/shairport-sync
 COPY          --from=builder /usr/local/lib/libalac.so.0 /boot/lib/
-COPY          --from=healthcheck-builder /dist/bin/rtsp-health /boot/bin/
+COPY          --from=builder-healthcheck /dist/bin/rtsp-health /boot/bin/
 
 # Catch-up with libalac
 ENV           LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/boot/lib"
