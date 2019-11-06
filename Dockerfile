@@ -1,4 +1,19 @@
 #######################
+# Extra builder for healthchecker
+#######################
+FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder                                                   AS builder-healthcheck
+
+ARG           HEALTH_VER=51ebf8ca3d255e0c846307bf72740f731e6210c3
+
+WORKDIR       $GOPATH/src/github.com/dubo-dubon-duponey/healthcheckers
+RUN           git clone git://github.com/dubo-dubon-duponey/healthcheckers .
+RUN           git checkout $HEALTH_VER
+RUN           arch="${TARGETPLATFORM#*/}"; \
+              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/bin/rtsp-health ./cmd/rtsp
+
+RUN           chmod 555 /dist/bin/*
+
+#######################
 # Building image
 #######################
 FROM          dubodubonduponey/base:builder                                   AS builder
@@ -17,13 +32,13 @@ RUN           git clone git://github.com/mikebrady/shairport-sync
 RUN           git -C alac           checkout $ALAC_VERSION
 RUN           git -C shairport-sync checkout $SHAIRPORT_VER
 
-RUN           apt-get install -y --no-install-recommends \
+RUN           apt-get install -qq --no-install-recommends \
                 libasound2-dev=1.1.8-1 \
                 libpopt-dev=1.16-12 \
                 libsoxr-dev=0.1.2-3 \
                 libconfig-dev=1.5-0.4 \
                 libssl-dev=1.1.1d-0+deb10u2 \
-                libcrypto++-dev=5.6.4-8                                       > /dev/null
+                libcrypto++-dev=5.6.4-8
 
 # ALAC (from apple)
 WORKDIR       /build/alac
@@ -49,19 +64,6 @@ RUN           autoreconf -fi \
                 && make install
 
 #######################
-# Extra builder for golang healthchecker
-#######################
-FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder         AS healthcheck-builder
-
-# XXX not cool - move that code into a proper separate repo (along with http-client)
-WORKDIR       $GOPATH/src/github.com/dubo-dubon-duponey/healthchecker
-COPY          rtsp-client.go cmd/rtsp-client/rtsp-client.go
-RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/bin/rtsp-client ./cmd/rtsp-client
-
-RUN           chmod 555 /dist/bin/*
-
-#######################
 # Running image
 #######################
 FROM          dubodubonduponey/base:runtime
@@ -70,32 +72,32 @@ USER          root
 
 ARG           DEBIAN_FRONTEND="noninteractive"
 ENV           TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
-RUN           apt-get update                > /dev/null \
-              && apt-get install -y --no-install-recommends \
+RUN           apt-get update -qq \
+              && apt-get install -qq --no-install-recommends \
                 libasound2=1.1.8-1 \
                 libpopt0=1.16-12 \
                 libsoxr0=0.1.2-3 \
                 libconfig9=1.5-0.4 \
-                libssl1.1=1.1.1c-1          > /dev/null \
-              && apt-get -y autoremove      > /dev/null \
-              && apt-get -y clean            \
-              && rm -rf /var/lib/apt/lists/* \
-              && rm -rf /tmp/*               \
+                libssl1.1=1.1.1c-1 \
+              && apt-get -qq autoremove       \
+              && apt-get -qq clean            \
+              && rm -rf /var/lib/apt/lists/*  \
+              && rm -rf /tmp/*                \
               && rm -rf /var/tmp/*
 
 USER          dubo-dubon-duponey
 
 COPY          --from=builder /usr/local/bin/shairport-sync /boot/bin/shairport-sync
 COPY          --from=builder /usr/local/lib/libalac.so.0 /boot/lib/
-COPY          --from=healthcheck-builder /dist/bin/rtsp-client /boot/bin/
+COPY          --from=healthcheck-builder /dist/bin/rtsp-health /boot/bin/
 
 # Catch-up with libalac
 ENV           LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/boot/lib"
 ENV           NAME=TotaleCroquette
+
 ENV           HEALTHCHECK_URL=rtsp://127.0.0.1:5000
-ENV           PATH=/boot/bin:$PATH
 
 EXPOSE        5000/tcp
 EXPOSE        6001-6011/udp
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=1 CMD rtsp-client || exit 1
+HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=1 CMD rtsp-health || exit 1
