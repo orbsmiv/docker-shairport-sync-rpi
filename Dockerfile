@@ -9,9 +9,7 @@ WORKDIR       $GOPATH/src/github.com/dubo-dubon-duponey/healthcheckers
 RUN           git clone git://github.com/dubo-dubon-duponey/healthcheckers .
 RUN           git checkout $HEALTH_VER
 RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/bin/rtsp-health ./cmd/rtsp
-
-RUN           chmod 555 /dist/bin/*
+              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/rtsp-health ./cmd/rtsp
 
 #######################
 # Building image
@@ -63,6 +61,14 @@ RUN           autoreconf -fi \
                 && make \
                 && make install
 
+COPY          --from=builder-healthcheck /dist/boot/bin           /dist/boot/bin
+RUN           cp /usr/local/bin/shairport-sync /dist/boot/bin
+RUN           chmod 555 /dist/boot/bin/*
+
+WORKDIR       /dist/boot/lib/
+RUN           cp /usr/lib/"$(gcc -dumpmachine)"/libasound.so.2  .
+RUN           cp /usr/local/lib/libalac.so.0 /dist/boot/lib/
+
 #######################
 # Running image
 #######################
@@ -74,7 +80,6 @@ ARG           DEBIAN_FRONTEND="noninteractive"
 ENV           TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 RUN           apt-get update -qq \
               && apt-get install -qq --no-install-recommends \
-                libasound2=1.1.8-1 \
                 libpopt0=1.16-12 \
                 libsoxr0=0.1.2-3 \
                 libconfig9=1.5-0.4 \
@@ -87,12 +92,8 @@ RUN           apt-get update -qq \
 
 USER          dubo-dubon-duponey
 
-COPY          --from=builder /usr/local/bin/shairport-sync /boot/bin/shairport-sync
-COPY          --from=builder /usr/local/lib/libalac.so.0 /boot/lib/
-COPY          --from=builder-healthcheck /dist/bin/rtsp-health /boot/bin/
+COPY          --from=builder --chown=$BUILD_UID:root /dist .
 
-# Catch-up with libalac
-ENV           LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/boot/lib"
 ENV           NAME=TotaleCroquette
 
 ENV           HEALTHCHECK_URL=rtsp://127.0.0.1:5000
