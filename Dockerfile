@@ -1,9 +1,10 @@
-FROM resin/armhf-alpine:latest AS builder
+#FROM resin/armhf-alpine:latest AS builder
+FROM balenalib/armv7hf-alpine:3.10-build AS builder
 MAINTAINER orbsmiv@hotmail.com
 
-RUN [ "cross-build-start" ]
+#RUN [ "cross-build-start" ]
 
-ARG SHAIRPORT_VER=development
+ARG SHAIRPORT_VER=3.3.5
 
 RUN apk --no-cache -U add \
         git \
@@ -17,14 +18,16 @@ RUN apk --no-cache -U add \
         libressl-dev \
         soxr-dev \
         avahi-dev \
-        libconfig-dev
+        libconfig-dev \
+        libsndfile-dev \
+        mosquitto-dev
 
-RUN mkdir /root/shairport-sync \
+RUN mkdir /tmp/shairport-sync \
         && git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} \
         git://github.com/mikebrady/shairport-sync \
-        /root/shairport-sync
+        /tmp/shairport-sync
 
-WORKDIR /root/shairport-sync
+WORKDIR /tmp/shairport-sync
 
 RUN autoreconf -i -f \
         && ./configure \
@@ -35,18 +38,21 @@ RUN autoreconf -i -f \
               --with-soxr \
               --with-metadata \
               --sysconfdir=/etc \
-        && make \
+              --without-libdaemon \
+#              --with-dbus-interface \
+              --with-mqtt-client \
+              --with-convolution \
+        && make -j $(nproc) \
         && make install
 
-RUN [ "cross-build-end" ]
+#RUN [ "cross-build-end" ]
 
+FROM balenalib/armv7hf-alpine:3.10-run
 
-FROM resin/armhf-alpine:latest
-
-RUN [ "cross-build-start" ]
+#RUN [ "cross-build-start" ]
 
 RUN apk add --no-cache \
-        dbus \
+#        dbus \
         alsa-lib \
         libdaemon \
         popt \
@@ -54,6 +60,8 @@ RUN apk add --no-cache \
         soxr \
         avahi \
         libconfig \
+        libsndfile \
+        mosquitto-libs \
       && rm -rf \
         /etc/ssl \
         /lib/apk/db/* \
@@ -68,4 +76,4 @@ ENV AIRPLAY_NAME Docker
 
 ENTRYPOINT [ "/start" ]
 
-RUN [ "cross-build-end" ]
+#RUN [ "cross-build-end" ]
