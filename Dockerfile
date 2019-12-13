@@ -65,6 +65,7 @@ COPY          --from=builder-healthcheck /dist/boot/bin           /dist/boot/bin
 RUN           cp /usr/local/bin/shairport-sync /dist/boot/bin
 RUN           chmod 555 /dist/boot/bin/*
 
+# TODO move the other libraries in as well to avoid installation in the runtime image
 WORKDIR       /dist/boot/lib/
 RUN           cp /usr/lib/"$(gcc -dumpmachine)"/libasound.so.2  .
 RUN           cp /usr/local/lib/libalac.so.0 /dist/boot/lib/
