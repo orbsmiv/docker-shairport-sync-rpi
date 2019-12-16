@@ -16,7 +16,7 @@ This is based on [shairport-sync](https://github.com/mikebrady/shairport-sync) a
     * [x] image runs with no capabilities
     * [x] process runs as a non-root user, disabled login, no shell
  * lightweight
-    * [x] based on `debian:buster-slim`
+    * [x] based on our slim [Debian buster version](https://github.com/dubo-dubon-duponey/docker-debian)
     * [x] simple entrypoint script
     * [ ] multi-stage build with ~~no installed~~ dependencies for the runtime image:
       * libdaemon0
@@ -25,9 +25,9 @@ This is based on [shairport-sync](https://github.com/mikebrady/shairport-sync) a
       * libconfig9
       * libssl1.1
  * observable
-    * [✓] healthcheck
-    * [✓] log to stdout
-    * [ ] ~~prometheus endpoint~~
+    * [x] healthcheck
+    * [x] log to stdout
+    * [ ] ~~prometheus endpoint~~ not applicable
 
 ## Run
 
