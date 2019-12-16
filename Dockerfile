@@ -84,7 +84,7 @@ RUN           apt-get update -qq \
                 libpopt0=1.16-12 \
                 libsoxr0=0.1.2-3 \
                 libconfig9=1.5-0.4 \
-                libssl1.1=1.1.1c-1 \
+                libssl1.1=1.1.1d-0+deb10u2 \
               && apt-get -qq autoremove       \
               && apt-get -qq clean            \
               && rm -rf /var/lib/apt/lists/*  \
