@@ -70,10 +70,10 @@ RUN apk add --no-cache \
 COPY --from=builder /etc/shairport-sync* /etc/
 COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
 
-COPY start.sh /start
+COPY start.sh /start.sh
 
 ENV AIRPLAY_NAME Docker
 
-ENTRYPOINT [ "/start" ]
+ENTRYPOINT [ "/start.sh" ]
 
 #RUN [ "cross-build-end" ]
