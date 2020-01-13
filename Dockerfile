@@ -52,7 +52,6 @@ FROM balenalib/armv7hf-alpine:3.11-run
 #RUN [ "cross-build-start" ]
 
 RUN apk add --no-cache \
-#        dbus \
         alsa-lib \
         libdaemon \
         popt \
@@ -78,8 +77,6 @@ RUN addgroup -g 29 audiorpi && addgroup shairport-sync audiorpi
 COPY start.sh /start.sh
 
 ENV AIRPLAY_NAME Docker
-
-#USER shairport-sync
 
 ENTRYPOINT [ "/start.sh" ]
 
