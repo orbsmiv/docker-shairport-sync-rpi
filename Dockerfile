@@ -1,5 +1,5 @@
 #FROM resin/armhf-alpine:latest AS builder
-FROM balenalib/armv7hf-alpine:3.10-build AS builder
+FROM balenalib/armv7hf-alpine:3.11-build AS builder
 MAINTAINER orbsmiv@hotmail.com
 
 #RUN [ "cross-build-start" ]
@@ -39,7 +39,7 @@ RUN autoreconf -i -f \
               --with-metadata \
               --sysconfdir=/etc \
               --without-libdaemon \
-#              --with-dbus-interface \
+              --with-dbus-interface \
               --with-mqtt-client \
               --with-convolution \
         && make -j $(nproc) \
@@ -47,7 +47,7 @@ RUN autoreconf -i -f \
 
 #RUN [ "cross-build-end" ]
 
-FROM balenalib/armv7hf-alpine:3.10-run
+FROM balenalib/armv7hf-alpine:3.11-run
 
 #RUN [ "cross-build-start" ]
 
@@ -62,17 +62,24 @@ RUN apk add --no-cache \
         libconfig \
         libsndfile \
         mosquitto-libs \
+	su-exec \
       && rm -rf \
         /etc/ssl \
         /lib/apk/db/* \
         /root/shairport-sync
 
 COPY --from=builder /etc/shairport-sync* /etc/
+COPY --from=builder /etc/dbus-1/system.d/shairport-sync-dbus.conf /etc/dbus-1/system.d/
 COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
+
+RUN addgroup shairport-sync && adduser -D shairport-sync -G shairport-sync
+RUN addgroup -g 29 audiorpi && addgroup shairport-sync audiorpi
 
 COPY start.sh /start.sh
 
 ENV AIRPLAY_NAME Docker
+
+#USER shairport-sync
 
 ENTRYPOINT [ "/start.sh" ]
 
