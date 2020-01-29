@@ -1,9 +1,11 @@
-FROM resin/armhf-alpine:latest AS builder
+#FROM resin/armhf-alpine:latest AS builder
+FROM balenalib/armv7hf-alpine:3.11-build AS builder
 MAINTAINER orbsmiv@hotmail.com
 
 RUN [ "cross-build-start" ]
 
-ARG SHAIRPORT_VER=development
+# Deliberately version agnostic - override this arg at build time
+ARG SHAIRPORT_VER=x.x.x
 
 RUN apk --no-cache -U add \
         git \
@@ -17,14 +19,16 @@ RUN apk --no-cache -U add \
         libressl-dev \
         soxr-dev \
         avahi-dev \
-        libconfig-dev
+        libconfig-dev \
+        libsndfile-dev \
+        mosquitto-dev
 
-RUN mkdir /root/shairport-sync \
+RUN mkdir /tmp/shairport-sync \
         && git clone --recursive --depth 1 --branch ${SHAIRPORT_VER} \
         git://github.com/mikebrady/shairport-sync \
-        /root/shairport-sync
+        /tmp/shairport-sync
 
-WORKDIR /root/shairport-sync
+WORKDIR /tmp/shairport-sync
 
 RUN autoreconf -i -f \
         && ./configure \
@@ -35,18 +39,20 @@ RUN autoreconf -i -f \
               --with-soxr \
               --with-metadata \
               --sysconfdir=/etc \
-        && make \
+              --without-libdaemon \
+              --with-dbus-interface \
+              --with-mqtt-client \
+              --with-convolution \
+        && make -j $(nproc) \
         && make install
 
 RUN [ "cross-build-end" ]
 
-
-FROM resin/armhf-alpine:latest
+FROM balenalib/armv7hf-alpine:3.11-run
 
 RUN [ "cross-build-start" ]
 
 RUN apk add --no-cache \
-        dbus \
         alsa-lib \
         libdaemon \
         popt \
@@ -54,18 +60,29 @@ RUN apk add --no-cache \
         soxr \
         avahi \
         libconfig \
+        libsndfile \
+        mosquitto-libs \
+	su-exec \
       && rm -rf \
         /etc/ssl \
         /lib/apk/db/* \
         /root/shairport-sync
 
 COPY --from=builder /etc/shairport-sync* /etc/
+COPY --from=builder /etc/dbus-1/system.d/shairport-sync-dbus.conf /etc/dbus-1/system.d/
 COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
 
-COPY start.sh /start
+# Create non-root user for running the container
+RUN addgroup shairport-sync && adduser -D shairport-sync -G shairport-sync
+
+# Define the rpi's audio group (and corresponding GID) so that the running container can
+# access the necessary devices
+RUN addgroup -g 29 audiorpi && addgroup shairport-sync audiorpi
+
+COPY start.sh /start.sh
 
 ENV AIRPLAY_NAME Docker
 
-ENTRYPOINT [ "/start" ]
+ENTRYPOINT [ "/start.sh" ]
 
 RUN [ "cross-build-end" ]
