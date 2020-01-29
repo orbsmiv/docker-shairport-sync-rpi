@@ -4,7 +4,8 @@ MAINTAINER orbsmiv@hotmail.com
 
 RUN [ "cross-build-start" ]
 
-ARG SHAIRPORT_VER=3.3.5
+# Deliberately version agnostic - override this arg at build time
+ARG SHAIRPORT_VER=x.x.x
 
 RUN apk --no-cache -U add \
         git \
