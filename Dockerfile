@@ -2,7 +2,7 @@
 FROM balenalib/armv7hf-alpine:3.11-build AS builder
 MAINTAINER orbsmiv@hotmail.com
 
-#RUN [ "cross-build-start" ]
+RUN [ "cross-build-start" ]
 
 ARG SHAIRPORT_VER=3.3.5
 
@@ -45,11 +45,11 @@ RUN autoreconf -i -f \
         && make -j $(nproc) \
         && make install
 
-#RUN [ "cross-build-end" ]
+RUN [ "cross-build-end" ]
 
 FROM balenalib/armv7hf-alpine:3.11-run
 
-#RUN [ "cross-build-start" ]
+RUN [ "cross-build-start" ]
 
 RUN apk add --no-cache \
         alsa-lib \
@@ -80,4 +80,4 @@ ENV AIRPLAY_NAME Docker
 
 ENTRYPOINT [ "/start.sh" ]
 
-#RUN [ "cross-build-end" ]
+RUN [ "cross-build-end" ]
