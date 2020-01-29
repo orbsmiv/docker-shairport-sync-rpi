@@ -71,7 +71,11 @@ COPY --from=builder /etc/shairport-sync* /etc/
 COPY --from=builder /etc/dbus-1/system.d/shairport-sync-dbus.conf /etc/dbus-1/system.d/
 COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
 
+# Create non-root user for running the container
 RUN addgroup shairport-sync && adduser -D shairport-sync -G shairport-sync
+
+# Define the rpi's audio group (and corresponding GID) so that the running container can
+# access the necessary devices
 RUN addgroup -g 29 audiorpi && addgroup shairport-sync audiorpi
 
 COPY start.sh /start.sh
