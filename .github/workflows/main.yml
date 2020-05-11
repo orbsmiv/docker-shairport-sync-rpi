@@ -26,12 +26,14 @@ jobs:
         LATEST_IMAGE: ${{ steps.latest_image_timestamp.outputs.timestamp }}
       run: |
         echo "Version ${LATEST} was released at ${LATEST_DATE}"
+        echo "::set-env name=LATEST_DATE::${{ steps.latest_version.outputs.latest_tag_published_at }}"
         echo "Latest tag published at ${LATEST_IMAGE}"
+        echo "::set-env name=LATEST_IMAGE::${{ steps.latest_image_timestamp.outputs.timestamp }}"
     - name: Test if continue
-      if: ${{ steps.latest_version.outputs.latest_tag_published_at > steps.latest_image_timestamp.outputs.timestamp }}
+      if: ${{ env.LATEST_DATE > env.LATEST_IMAGE }}
       run: |
         echo "We're continuing"
     - name: Test if not continue
-      if: ${{ steps.latest_version.outputs.latest_tag_published_at < steps.latest_image_timestamp.outputs.timestamp }}
+      if: ${{ env.LATEST_DATE > env.LATEST_IMAGE }}
       run: |
         echo "We're not continuing"
