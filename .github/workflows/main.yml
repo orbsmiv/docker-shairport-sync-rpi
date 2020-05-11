@@ -12,7 +12,7 @@ jobs:
     - name: Get the timestamp of the latest image on Docker Hub
       id: latest_image_timestamp
       run: |
-        echo "::set-output name=timestamp::$(curl -L --silent https://registry.hub.docker.com/v2/repositories/orbsmiv/shairport-sync-rpi/tags/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['last_updated'])""
+        echo "::set-output name=timestamp::$(curl -L --silent https://registry.hub.docker.com/v2/repositories/orbsmiv/shairport-sync-rpi/tags/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['last_updated'])")"
     - name: Get Latest Upstream Release
       id: latest_version
       uses: abatilo/release-info-action@v1.1.0
