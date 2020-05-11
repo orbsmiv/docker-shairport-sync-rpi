@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "*/15 * * * *"
 
 name: Example
 jobs:
@@ -9,7 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Get Latest Release
+    - name: Get the timestamp of the latest image on Docker Hub
+      id: latest_image_timestamp
+      run: |
+        echo "::set-output name=timestamp::$(curl -L --silent https://registry.hub.docker.com/v2/repositories/orbsmiv/shairport-sync-rpi/tags/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['last_updated'])""
+    - name: Get Latest Upstream Release
       id: latest_version
       uses: abatilo/release-info-action@v1.1.0
       with:
@@ -19,5 +23,7 @@ jobs:
       env:
         LATEST: ${{ steps.latest_version.outputs.latest_tag }}
         LATEST_DATE: ${{ steps.latest_version.outputs.latest_tag_published_at }}
+        LATEST_IMAGE: ${{ steps.latest_image_timestamp.outputs.timestamp }}
       run: |
-        echo "Version $LATEST was released at $LATEST_DATE"
+        echo "Version ${LATEST} was released at ${LATEST_DATE}"
+        echo "Latest tag published at ${LATEST_IMAGE}"
