@@ -24,14 +24,11 @@ jobs:
         LATEST: ${{ steps.latest_version.outputs.latest_tag }}
         LATEST_DATE: ${{ steps.latest_version.outputs.latest_tag_published_at }}
         LATEST_IMAGE: ${{ steps.latest_image_timestamp.outputs.timestamp }}
-#       run: |
-#         echo "Version ${LATEST} was released at ${LATEST_DATE}"
-#         echo "::set-env name=LATEST_DATE::${LATEST_DATE}"
-#         echo "Latest tag published at ${LATEST_IMAGE}"
-#         echo "::set-env name=LATEST_IMAGE::${LATEST_IMAGE}"
       run: |
         echo "Version ${LATEST} was released at ${LATEST_DATE}"
+        echo "::set-env name=LATEST_DATE::${LATEST_DATE}"
         echo "Latest tag published at ${LATEST_IMAGE}"
+        echo "::set-env name=LATEST_IMAGE::${LATEST_IMAGE}"
     - name: Check env storing correctly
       run: |
         echo "Latest date from env is: ${{ env.LATEST_DATE }}"
