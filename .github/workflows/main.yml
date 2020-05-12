@@ -29,6 +29,10 @@ jobs:
         echo "::set-env name=LATEST_DATE::${LATEST_DATE}"
         echo "Latest tag published at ${LATEST_IMAGE}"
         echo "::set-env name=LATEST_IMAGE::${LATEST_IMAGE}"
+    - name: Check env storing correctly
+      run: |
+        echo "Latest date from env is: ${{ env.LATEST_DATE }}"
+        echo "Latest image from env is: ${{ env.LATEST_IMAGE }}"
     - name: Test if continue
       if: ${{ env.LATEST_DATE > env.LATEST_IMAGE }}
       run: |
