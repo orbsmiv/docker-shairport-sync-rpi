@@ -6,7 +6,7 @@ name: Example
 jobs:
   latest-version:
     name: Get Latest Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - name: Get the timestamp of the latest image on Docker Hub
@@ -41,3 +41,10 @@ jobs:
       if: env.LATEST_DATE < env.LATEST_IMAGE
       run: |
         echo "We're not continuing"
+  fake-build:
+    runs-on: ubuntu-18.04
+    if: env.LATEST_DATE < env.LATEST_IMAGE
+    steps:
+      - name: test-output
+        run: |
+          echo "This job will run"
