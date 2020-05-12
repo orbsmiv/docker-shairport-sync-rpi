@@ -38,6 +38,6 @@ jobs:
       run: |
         echo "We're continuing"
     - name: Test if not continue
-      if: env.LATEST_DATE > env.LATEST_IMAGE
+      if: env.LATEST_DATE < env.LATEST_IMAGE
       run: |
         echo "We're not continuing"
