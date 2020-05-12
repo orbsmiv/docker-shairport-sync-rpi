@@ -34,10 +34,10 @@ jobs:
         echo "Latest date from env is: ${{ env.LATEST_DATE }}"
         echo "Latest image from env is: ${{ env.LATEST_IMAGE }}"
     - name: Test if continue
-      if: ${{ env.LATEST_DATE > env.LATEST_IMAGE }}
+      if: env.LATEST_DATE > env.LATEST_IMAGE
       run: |
         echo "We're continuing"
     - name: Test if not continue
-      if: ${{ env.LATEST_DATE > env.LATEST_IMAGE }}
+      if: env.LATEST_DATE > env.LATEST_IMAGE
       run: |
         echo "We're not continuing"
