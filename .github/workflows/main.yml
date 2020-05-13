@@ -1,6 +1,9 @@
 on:
   schedule:
     - cron: "*/15 * * * *"
+  push:
+    branches:
+      - dev
 
 name: Example
 jobs:
@@ -12,7 +15,6 @@ jobs:
       latest_release_timestamp: ${{ steps.latest_release.outputs.latest_tag_published_at }}
       latest_release_name: ${{ steps.latest_release.outputs.latest_tag }}
     steps:
-    - uses: actions/checkout@v2
     - name: Get the timestamp of the latest image on Docker Hub
       id: latest_image_timestamp
       run: |
@@ -27,7 +29,7 @@ jobs:
   docker_buildx:
     runs-on: ubuntu-18.04
     needs: latest-version
-#     if: needs.latest-version.outputs.latest_release_timestamp > needs.latest-version.outputs.latest_image_timestamp
+    if: github.event_name == "push" || needs.latest-version.outputs.latest_release_timestamp > needs.latest-version.outputs.latest_image_timestamp
     steps:
       - name: test-output
         run: |
@@ -43,5 +45,15 @@ jobs:
           qemu-version: latest
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
-        
+      - name: Run Buildx (no push-to-hub)
+        run: |
+          docker buildx build \
+          --platform linux/arm/v7 \
+          --output "type=image,push=false" \
+          --build-arg "SHAIRPORT_VER=${{needs.latest-version.outputs.latest_release_name}}" \
+          --tag orbsmiv/shairport-sync-rpi:${{needs.latest-version.outputs.latest_release_name}} \
+          --tag orbsmiv/shairport-sync-rpi:latest \
+          --file ./Dockerfile \
+          .
+          
 
