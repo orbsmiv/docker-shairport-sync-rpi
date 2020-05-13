@@ -48,9 +48,10 @@ jobs:
   fake-build:
     runs-on: ubuntu-18.04
     needs: latest-version
-#     if: env.LATEST_DATE < env.LATEST_IMAGE
+    if: needs.latest-version.outputs.latest_release_timestamp < needs.latest-version.outputs.latest_image_timestamp
     steps:
       - name: test-output
         run: |
           echo "Version ${{needs.latest-version.outputs.latest_release_name}} was released at ${{needs.latest-version.outputs.latest_release_timestamp}}"
           echo "Latest tag published at ${{needs.latest-version.outputs.latest_image_timestamp}}"
+          echo "Image is newer than release. No build required."
