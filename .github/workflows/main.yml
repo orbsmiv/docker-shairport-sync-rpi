@@ -7,6 +7,10 @@ jobs:
   latest-version:
     name: Get Latest Release
     runs-on: ubuntu-18.04
+    outputs:
+      latest_image_timestamp: ${{ steps.latest_image_timestamp.outputs.timestamp }}
+      latest_release_timestamp: ${{ steps.latest_release.outputs.latest_tag_published_at }}
+      latest_release_name: ${{ steps.latest_release.outputs.latest_tag }}
     steps:
     - uses: actions/checkout@v2
     - name: Get the timestamp of the latest image on Docker Hub
@@ -14,37 +18,39 @@ jobs:
       run: |
         echo "::set-output name=timestamp::$(curl -L --silent https://registry.hub.docker.com/v2/repositories/orbsmiv/shairport-sync-rpi/tags/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['last_updated'])")"
     - name: Get Latest Upstream Release
-      id: latest_version
+      id: latest_release
       uses: abatilo/release-info-action@v1.1.0
       with:
         owner: mikebrady
         repo: shairport-sync
-    - name: Example of consumption of the output
-      env:
-        LATEST: ${{ steps.latest_version.outputs.latest_tag }}
-        LATEST_DATE: ${{ steps.latest_version.outputs.latest_tag_published_at }}
-        LATEST_IMAGE: ${{ steps.latest_image_timestamp.outputs.timestamp }}
-      run: |
-        echo "Version ${LATEST} was released at ${LATEST_DATE}"
-        echo "::set-env name=LATEST_DATE::${LATEST_DATE}"
-        echo "Latest tag published at ${LATEST_IMAGE}"
-        echo "::set-env name=LATEST_IMAGE::${LATEST_IMAGE}"
-    - name: Check env storing correctly
-      run: |
-        echo "Latest date from env is: ${{ env.LATEST_DATE }}"
-        echo "Latest image from env is: ${{ env.LATEST_IMAGE }}"
-    - name: Test if continue
-      if: env.LATEST_DATE > env.LATEST_IMAGE
-      run: |
-        echo "We're continuing"
-    - name: Test if not continue
-      if: env.LATEST_DATE < env.LATEST_IMAGE
-      run: |
-        echo "We're not continuing"
+#     - name: Example of consumption of the output
+#       env:
+#         LATEST: ${{ steps.latest_release.outputs.latest_tag }}
+#         LATEST_DATE: ${{ steps.latest_release.outputs.latest_tag_published_at }}
+#         LATEST_IMAGE: ${{ steps.latest_image_timestamp.outputs.timestamp }}
+#       run: |
+#         echo "Version ${LATEST} was released at ${LATEST_DATE}"
+#         echo "::set-env name=LATEST_DATE::${LATEST_DATE}"
+#         echo "Latest tag published at ${LATEST_IMAGE}"
+#         echo "::set-env name=LATEST_IMAGE::${LATEST_IMAGE}"
+#     - name: Check env storing correctly
+#       run: |
+#         echo "Latest date from env is: ${{ env.LATEST_DATE }}"
+#         echo "Latest image from env is: ${{ env.LATEST_IMAGE }}"
+#     - name: Test if continue
+#       if: env.LATEST_DATE > env.LATEST_IMAGE
+#       run: |
+#         echo "We're continuing"
+#     - name: Test if not continue
+#       if: env.LATEST_DATE < env.LATEST_IMAGE
+#       run: |
+#         echo "We're not continuing"
   fake-build:
     runs-on: ubuntu-18.04
-    if: env.LATEST_DATE < env.LATEST_IMAGE
+    needs: latest-version
+#     if: env.LATEST_DATE < env.LATEST_IMAGE
     steps:
       - name: test-output
         run: |
-          echo "This job will run"
+          echo "Version ${{needs.latest-version.outputs.latest_release_name}} was released at ${{needs.latest-version.outputs.latest_release_timestamp}}"
+          echo "Latest tag published at ${{needs.latest-version.outputs.latest_image_timestamp}}"
