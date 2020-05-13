@@ -55,3 +55,13 @@ jobs:
           echo "Version ${{needs.latest-version.outputs.latest_release_name}} was released at ${{needs.latest-version.outputs.latest_release_timestamp}}"
           echo "Latest tag published at ${{needs.latest-version.outputs.latest_image_timestamp}}"
           echo "Image is newer than release. No build required."
+  fake-build-2:
+    runs-on: ubuntu-18.04
+    needs: latest-version
+    if: needs.latest-version.outputs.latest_release_timestamp > needs.latest-version.outputs.latest_image_timestamp
+    steps:
+      - name: test-output
+        run: |
+          echo "Version ${{needs.latest-version.outputs.latest_release_name}} was released at ${{needs.latest-version.outputs.latest_release_timestamp}}"
+          echo "Latest tag published at ${{needs.latest-version.outputs.latest_image_timestamp}}"
+          echo "Release is newer than image. Build required."
