@@ -55,5 +55,11 @@ jobs:
           --tag orbsmiv/shairport-sync-rpi:latest \
           --file ./Dockerfile \
           .
+      - name: check built version
+        run: |
+          docker run --rm \
+          --entrypoint /usr/local/bin/shairport-sync \
+          orbsmiv/shairport-sync-rpi:${{needs.latest-version.outputs.latest_release_name}} \
+          -V
           
 
