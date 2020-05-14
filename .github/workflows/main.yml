@@ -55,6 +55,9 @@ jobs:
           --tag orbsmiv/shairport-sync-rpi:latest \
           --file ./Dockerfile \
           .
+      - name: List Docker images
+        run: |
+          docker images
       - name: check built version
         run: |
           docker run --rm \
