@@ -60,8 +60,10 @@ jobs:
           buildx-version: latest
           qemu-version: latest
 
-      - name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
+      - name: Available platforms and refs info
+        run: |
+          echo ${{ steps.buildx.outputs.platforms }}
+          echo "We're building on the ${{ github.ref }} branch"
 
       - name: Run Buildx (no push-to-hub)
         run: |
@@ -82,7 +84,7 @@ jobs:
           echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
 
       - name: Run Buildx (with push)
-        if: success()
+        if: success() && github.ref == 'refs/heads/master'
         run: |
           docker buildx build \
           --platform ${{ steps.prepare.outputs.docker_platforms }} \
