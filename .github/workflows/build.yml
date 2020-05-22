@@ -3,7 +3,7 @@ on:
     - cron: "*/15 * * * *"
   push:
     branches:
-      - 'dev'
+      - dev
     paths:
       - 'Dockerfile'
       - '.github/workflows/build.yml'
