@@ -77,14 +77,16 @@ jobs:
           .
 
       - name: Docker Login
-        if: success() && github.ref == 'refs/heads/master'
+        # if: success() && github.ref == 'refs/heads/master'
+        if: success()
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
 
       - name: Run Buildx (with push)
-        if: success() && github.ref == 'refs/heads/master'
+        # if: success() && github.ref == 'refs/heads/master'
+        if: success()
         run: |
           docker buildx build \
           --platform ${{ steps.prepare.outputs.docker_platforms }} \
