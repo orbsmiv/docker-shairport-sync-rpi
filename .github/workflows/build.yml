@@ -1,0 +1,93 @@
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  push:
+    branches:
+      - 'dev'
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/build.yml'
+
+name: Docker Build
+jobs:
+  latest-version:
+    name: Get Latest Release
+    runs-on: ubuntu-18.04
+    outputs:
+      latest_image_timestamp: ${{ steps.latest_image_timestamp.outputs.timestamp }}
+      latest_release_timestamp: ${{ steps.latest_release.outputs.latest_tag_published_at }}
+      latest_release_name: ${{ steps.latest_release.outputs.latest_tag }}
+    steps:
+    - name: Get the timestamp of the latest image on Docker Hub
+      id: latest_image_timestamp
+      run: |
+        echo "::set-output name=timestamp::$(curl -L --silent https://registry.hub.docker.com/v2/repositories/orbsmiv/shairport-sync-rpi/tags/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['last_updated'])")"
+    - name: Get Latest Upstream Release
+      id: latest_release
+      uses: abatilo/release-info-action@v1.1.0
+      with:
+        owner: mikebrady
+        repo: shairport-sync
+
+  docker_buildx:
+    runs-on: ubuntu-18.04
+    needs: latest-version
+    if: github.event_name == 'push' || needs.latest-version.outputs.latest_release_timestamp > needs.latest-version.outputs.latest_image_timestamp
+    steps:
+      - name: test-output
+        run: |
+          echo "Version ${{ needs.latest-version.outputs.latest_release_name }} was released at ${{ needs.latest-version.outputs.latest_release_timestamp }}"
+          echo "Latest tag published at ${{ needs.latest-version.outputs.latest_image_timestamp }}"
+          echo "Release is newer than image. Build required."
+
+      - name: Prepare
+        id: prepare
+        run: |
+          echo ::set-output name=docker_platforms::linux/arm/v7
+          echo ::set-output name=docker_username::orbsmiv
+          echo ::set-output name=docker_image::orbsmiv/testing
+          # echo ::set-output name=docker_image::orbsmiv/shairport-sync-rpi
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1.6.1
+        with:
+          buildx-version: latest
+          qemu-version: latest
+
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+
+      - name: Run Buildx (no push-to-hub)
+        run: |
+          docker buildx build \
+          --platform ${{ steps.prepare.outputs.docker_platforms }} \
+          --output "type=image,push=false" \
+          --build-arg "SHAIRPORT_VER=${{ needs.latest-version.outputs.latest_release_name }}" \
+          --tag ${{ steps.prepare.outputs.docker_image }}:${{ needs.latest-version.outputs.latest_release_name }} \
+          --tag ${{ steps.prepare.outputs.docker_image }}:latest \
+          --file ./Dockerfile \
+          .
+
+      - name: Docker Login
+        if: success() && github.ref == 'refs/heads/master'
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
+
+      - name: Run Buildx (with push)
+        if: success()
+        run: |
+          docker buildx build \
+          --platform ${{ steps.prepare.outputs.docker_platforms }} \
+          --output "type=image,push=true" \
+          --build-arg "SHAIRPORT_VER=${{needs.latest-version.outputs.latest_release_name}}" \
+          --tag ${{ steps.prepare.outputs.docker_image }}:${{needs.latest-version.outputs.latest_release_name}} \
+          --tag ${{ steps.prepare.outputs.docker_image }}:latest \
+          --file ./Dockerfile \
+          .
+          
+
