@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - dev
-    # paths:
-    #   - 'Dockerfile'
-    #   - '.github/workflows/build.yml'
   pull_request:
     branches:
       - master
@@ -77,16 +74,14 @@ jobs:
           .
 
       - name: Docker Login
-        # if: success() && github.ref == 'refs/heads/master'
-        if: success()
+        if: success() && github.ref == 'refs/heads/master'
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
 
       - name: Run Buildx (with push)
-        # if: success() && github.ref == 'refs/heads/master'
-        if: success()
+        if: success() && github.ref == 'refs/heads/master'
         run: |
           docker buildx build \
           --platform ${{ steps.prepare.outputs.docker_platforms }} \
