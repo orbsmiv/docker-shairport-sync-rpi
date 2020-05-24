@@ -72,7 +72,7 @@ jobs:
           .
 
       - name: Docker Login
-        if: success() && github.ref == 'refs/heads/master'
+        if: success()
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
