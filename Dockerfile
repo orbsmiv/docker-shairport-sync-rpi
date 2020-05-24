@@ -1,8 +1,5 @@
-#FROM resin/armhf-alpine:latest AS builder
-FROM balenalib/armv7hf-alpine:3.11-build AS builder
+FROM alpine:3.11 AS builder
 MAINTAINER orbsmiv@hotmail.com
-
-RUN [ "cross-build-start" ]
 
 # Deliberately version agnostic - override this arg at build time
 ARG SHAIRPORT_VER=x.x.x
@@ -46,16 +43,14 @@ RUN autoreconf -i -f \
         && make -j $(nproc) \
         && make install
 
-RUN [ "cross-build-end" ]
-
-FROM balenalib/armv7hf-alpine:3.11-run
-
-RUN [ "cross-build-start" ]
+FROM alpine:3.11
 
 RUN apk add --no-cache \
         alsa-lib \
         libdaemon \
+        dbus \
         popt \
+        glib \
         libressl \
         soxr \
         avahi \
@@ -85,4 +80,3 @@ ENV AIRPLAY_NAME Docker
 
 ENTRYPOINT [ "/start.sh" ]
 
-RUN [ "cross-build-end" ]
