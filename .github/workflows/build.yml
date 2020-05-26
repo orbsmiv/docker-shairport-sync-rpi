@@ -21,10 +21,14 @@ jobs:
         echo "::set-output name=timestamp::$(curl -L --silent https://registry.hub.docker.com/v2/repositories/orbsmiv/shairport-sync-rpi/tags/latest | python3 -c "import sys, json; print(json.load(sys.stdin)['last_updated'])")"
     - name: Get Latest Upstream Release
       id: latest_release
-      uses: abatilo/release-info-action@v1.1.0
-      with:
-        owner: mikebrady
-        repo: shairport-sync
+      env:
+        OWNER: mikebrady
+        REPO: shairport-sync
+      run: |
+        release_json=$(curl -L --silent https://api.github.com/repos/${OWNER}/${REPO}/releases/latest)
+        echo "::set-output name=latest_tag::$(echo ${release_json} | python3 -c "import sys, json; print(json.load(sys.stdin)['tag_name'])")"
+        echo "::set-output name=latest_tag_published_at::$(echo ${release_json} | python3 -c "import sys, json; print(json.load(sys.stdin)['published_at'])")"
+  
 
   docker_buildx:
     runs-on: ubuntu-18.04
