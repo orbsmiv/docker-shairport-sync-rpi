@@ -11,8 +11,8 @@ jobs:
     name: Get Latest Release
     runs-on: ubuntu-18.04
     outputs:
-      latest_image_timestamp: ${{ steps.latest_image_timestamp.outputs.timestamp }}
-      latest_release_timestamp: ${{ steps.latest_release.outputs.latest_tag_published_at }}
+      latest_image_timestamp: "ts_${{ steps.latest_image_timestamp.outputs.timestamp }}"
+      latest_release_timestamp: "ts_${{ steps.latest_release.outputs.latest_tag_published_at }}"
       latest_release_name: ${{ steps.latest_release.outputs.latest_tag }}
     steps:
     - name: Get the timestamp of the latest image on Docker Hub
