@@ -1,4 +1,4 @@
-FROM alpine:3.11 AS builder
+FROM alpine:3.12 AS builder
 MAINTAINER orbsmiv@hotmail.com
 
 # Deliberately version agnostic - override this arg at build time
@@ -43,7 +43,7 @@ RUN autoreconf -i -f \
         && make -j $(nproc) \
         && make install
 
-FROM alpine:3.11
+FROM alpine:3.12
 
 RUN apk add --no-cache \
         alsa-lib \
