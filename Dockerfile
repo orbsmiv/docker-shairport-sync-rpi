@@ -15,7 +15,6 @@ RUN apk --no-cache -U add \
         popt-dev \
         libressl-dev \
         soxr-dev \
-        avahi-dev \
         libconfig-dev \
         libsndfile-dev \
         mosquitto-dev
@@ -31,13 +30,12 @@ RUN autoreconf -i -f \
         && ./configure \
               --with-alsa \
               --with-pipe \
-              --with-avahi \
+              --with-tinysvcmdns \
               --with-ssl=openssl \
               --with-soxr \
               --with-metadata \
               --sysconfdir=/etc \
               --without-libdaemon \
-              --with-dbus-interface \
               --with-mqtt-client \
               --with-convolution \
         && make -j $(nproc) \
@@ -48,12 +46,10 @@ FROM alpine:3.12
 RUN apk add --no-cache \
         alsa-lib \
         libdaemon \
-        dbus \
         popt \
         glib \
         libressl \
         soxr \
-        avahi \
         libconfig \
         libsndfile \
         mosquitto-libs \
@@ -64,7 +60,6 @@ RUN apk add --no-cache \
         /root/shairport-sync
 
 COPY --from=builder /etc/shairport-sync* /etc/
-COPY --from=builder /etc/dbus-1/system.d/shairport-sync-dbus.conf /etc/dbus-1/system.d/
 COPY --from=builder /usr/local/bin/shairport-sync /usr/local/bin/shairport-sync
 
 # Create non-root user for running the container
