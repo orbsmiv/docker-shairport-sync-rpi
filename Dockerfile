@@ -76,8 +76,8 @@ RUN addgroup -g 29 audiorpi && addgroup shairport-sync audiorpi
 
 COPY docker-entrypoint.sh /
 
-ENV AIRPLAY_NAME "Shairport on %H"
+ENV AIRPLAY_NAME "%h (Shairport-Sync %v)"
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
-CMD ["-u", "-v"]
+CMD ["-v"]
