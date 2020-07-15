@@ -74,9 +74,10 @@ RUN addgroup shairport-sync && adduser -D shairport-sync -G shairport-sync
 # access the necessary devices
 RUN addgroup -g 29 audiorpi && addgroup shairport-sync audiorpi
 
-COPY start.sh /start.sh
+COPY docker-entrypoint.sh /
 
-ENV AIRPLAY_NAME Docker
+ENV AIRPLAY_NAME "%h (Shairport-Sync %v)"
 
-ENTRYPOINT [ "/start.sh" ]
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
+CMD ["-v"]

@@ -49,6 +49,7 @@ jobs:
           echo ::set-output name=docker_username::orbsmiv
           echo ::set-output name=docker_image_testing::orbsmiv/testing
           echo ::set-output name=docker_image::orbsmiv/shairport-sync-rpi
+          echo ::set-output name=short_hash::$(echo ${{ github.sha }} | cut -c1-7)
 
       - uses: actions/checkout@v2
 
@@ -101,7 +102,7 @@ jobs:
           --platform ${{ steps.prepare.outputs.docker_platforms }} \
           --output "type=image,push=true" \
           --build-arg "SHAIRPORT_VER=${{needs.latest-version.outputs.latest_release_name}}" \
-          --tag ${{ steps.prepare.outputs.docker_image_testing }}:shairport-sync-$(date +'%s') \
+          --tag ${{ steps.prepare.outputs.docker_image_testing }}:shairport-sync-${{ github.head_ref }}-${{ steps.prepare.outputs.short_hash }} \
           --file ./Dockerfile \
           .
   
